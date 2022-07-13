@@ -1,6 +1,6 @@
 # ADD NEW STACKS TO LIST IN JOBS.CHANGES.STEPS.FILTER
-# Ctrl+F AND REPLACE ALL INSTANCES OF "ORGANIZATION"
-# MORE INFO: https://github.com/MassimilianoDH/terraform-infra-template
+# Ctrl+F AND REPLACE ALL INSTANCES OF "ORGANIZATION".
+# MORE INFO: https://github.com/MassimilianoDH/terraform-push
 ---
 name: "Terraform ORGANIZATION"
 
@@ -42,7 +42,7 @@ jobs:
           # Add new directories to this list using the following syntax. 
           # e.g. [NEW DIR]: stacks/[NEW DIR]/**
           filters: |
-            GKE: stacks/GKE/**
+            example-bucket: stacks/example-bucket/**
             
   # Job to test and apply each of modified stacks.
   # More info: https://github.com/hashicorp/setup-terraform
