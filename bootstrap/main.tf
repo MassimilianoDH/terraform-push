@@ -1,7 +1,7 @@
 # Apply this Terraform config to create a remote back-end.
 # Delete afterwards.
 # Ctrl+F AND REPLACE ALL INSTANCES OF "ORGANIZATION".
-# MORE INFO: https://github.com/MassimilianoDH/terraform-infra-template
+# MORE INFO: https://github.com/MassimilianoDH/terraform-push
 
 ##### main #####
 ################
