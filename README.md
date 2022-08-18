@@ -2,7 +2,7 @@
   <a href="" rel="noopener">
 </p>
 
-<h5 align="center">Terraform Push</h5>
+<h1 align="center">Terraform Push</h1>
 
 <div align="center">
 
