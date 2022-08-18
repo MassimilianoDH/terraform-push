@@ -42,8 +42,19 @@ The only prerequisite needed to set up your Terraform CI is a working Google Clo
 ### Installing
 A step by step series of examples that tell you how to get a development env running.
 
-Say what the step will be
+- [Repository](####Repository)
+- [Secrets](####Secrets)
+- [MU(optional)](####MU(optional))
+- [Bootstrap](####Bootstrap)
 
+#### Repository
+
+The fisrt step of our process is to crate a Github Repository using Terraform Push as a template. 
+
+
+#### Secrets
+#### MU(optional)
+#### Bootstrap
 ```
 Give the example
 ```
