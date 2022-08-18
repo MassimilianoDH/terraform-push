@@ -39,15 +39,12 @@ Setting up your own Terraform CI is now easy as it can get. Simply create a new 
 The only prerequisite needed to set up your Terraform CI is a working Google Cloud Project with billing enabled. For more information on how to [Creating and Managing Google Projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
 
 ### Installing
-A step by step series of examples that tell you how to get Terraform Push.
-
 - [Repository](###repository)
 - [Bootstrap](###bootstrap)
 - [Secrets](###secrets)
 - [Machine User (optional)](###machine_user)
 
 ## 🚀 Deployment <a name = "deployment"></a>
-
 ### Repository <a name = "repository"></a>
 The first step of our process is to create a Github Repository using Terraform Push as a template. On the top right corner of this repo (Terraform Push), you will find a green button to use this template. Press it and follow the repository creation form.
 
@@ -63,18 +60,8 @@ SSH_PRIVATE_KEY: SSH key pair used to log into private Terraform Module reposito
 
 PAT_TOKEN: Personal Access Token used to log into PRs and comment Terraform Plan output. More information on [Creating a Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token).
 
-### Machine User(optional) <a name = "machine_user"></a>
-To get our Terraform Plan outputs in a easy to access manner, these need to be posted as a comment on Pull Requests.  This can be done using your personal Github Account (not recommended) or it can be done using a Github Machine User. A machine user is no more than a dummy GitHub account that is granted write access on a per-repository basis. Use this account when adding PAT_TOKEN.
-
-## 🔧 Running the tests <a name = "tests"></a>
-Explain how to run the automated tests for this system.
-
-### Break down into end to end tests
-Explain what these tests test and why
-
-```
-Give an example
-```
+### Machine User (optional) <a name = "machine_user"></a>
+To get our Terraform Plan outputs in a easy to access manner, these need to be posted as a comment on Pull Requests.  This can be done using your personal Github Account (not recommended) or it can be done using a Github Machine User. A machine user is no more than a dummy GitHub account that is granted write access on a per-repository basis. Use this account when adding [PAT_TOKEN](###secrets).
 
 ## 🎈 Usage <a name="usage"></a>
 Add notes about how to use the system.
@@ -83,7 +70,7 @@ Add notes about how to use the system.
 - [Github Actions](https://github.com/features/actions) - Pipeline
 
 ## ✍️ Authors <a name = "authors"></a>
-- [@MassimilianoDH](https://github.com/MassimilianoDH) - Idea & Initial work
+- [@MassimilianoDH](https://github.com/MassimilianoDH) - Idea & Initial Work
 
 See also the list of [contributors](https://github.com/MassimilianoDH/terraform-push/contributors) who participated in this project.
 
