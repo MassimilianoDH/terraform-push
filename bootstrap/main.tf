@@ -9,7 +9,7 @@
 # GCP service account for Terraform.
 # More info: https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/google_service_account
 resource "google_service_account" "terraform_ci" {
-  ORGANIZATION      = "ORGANIZATION"
+  project      = "ORGANIZATION"
   account_id   = "terraform-ci"
   display_name = "terraform-ci"
   description  = "SA for CI managed by Terraform codebase"
@@ -18,7 +18,7 @@ resource "google_service_account" "terraform_ci" {
 # GCP role binding.
 # More info: https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/google_ORGANIZATION_iam
 resource "google_ORGANIZATION_iam_member" "terraform_ci" {
-  ORGANIZATION = "ORGANIZATION"
+  project = "ORGANIZATION"
   role    = "roles/owner"
   member  = "serviceAccount:terraform-ci@ORGANIZATION.iam.gserviceaccount.com"
 }
@@ -29,8 +29,8 @@ module "bucket" {
   source  = "terraform-google-modules/cloud-storage/google//modules/simple_bucket"
   version = "3.2.0"
 
-  name       = "ORGANIZATION-terraform-state"
-  ORGANIZATION_id = "ORGANIZATION"
+  name          = "ORGANIZATION-terraform-state"
+  project_id    = "ORGANIZATION"
   location      = "US"
   storage_class = "MULTI_REGIONAL"
 
