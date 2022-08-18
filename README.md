@@ -1,6 +1,5 @@
 <p align="center">
   <a href="" rel="noopener">
-  <img width=200px height=200px src="https://tenor.com/es/ver/beavis-computer-shitposting-gif-7431307" alt="Project logo"></a>
 </p>
 
 <h3 align="center">Terraform Push</h3>
@@ -25,7 +24,7 @@
 - [Getting Started](#getting_started)
 - [Deployment](#deployment)
 - [Usage](#usage)
-- [TODO](../TODO.md)
+- [TODO](../master/TODO.md)
 - [Built Using](#built_using)
 - [Authors](#authors)
 - [Acknowledgments](#acknowledgement)
