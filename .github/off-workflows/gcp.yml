@@ -19,9 +19,6 @@ env:
   # Needed to comment plan output in PR discussion.
   TF_VAR_github_owner: ORGANIZATION
   TF_VAR_github_token: ${{ secrets.PAT_TOKEN }}
-  # Needed to access Vault.
-  TF_VAR_vault_address: https://vault.ORGANIZATION.com/
-  TF_VAR_vault_token: ${{ secrets.VAULT_TOKEN }}
 
 jobs:
   # Job to list sub-directories.
