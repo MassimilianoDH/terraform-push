@@ -23,8 +23,8 @@ runs:
         cd $path
         tree -J -d -L 1 | jq -c '.[0].contents | map(.name)' > file.json
         list=$(jq -r --arg stacks $tail 'to_entries|map("\(.value): \( $stacks )\(.value)/**\n")|.[]' file.json)
+        echo "$list"
         list="${list//'%'/'%25'}"
         list="${list//$'\n'/'%0A'}"
         list="${list//$'\r'/'%0D'}"
-        echo "$list"
         echo "::set-output name=list::$list"
