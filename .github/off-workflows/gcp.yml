@@ -22,7 +22,7 @@ env:
 
 jobs:
   # Job to list sub-directories.
-  # More info: https://github.com/MassimilianoDH/terraform-push/.github/actions/list-directories/action.yml
+  # More info: https://github.com/MassimilianoDH/terraform-push/blob/master/.github/actions/list-directories/action.yml
   list-dirs:
     name: List Directories
     runs-on: ubuntu-latest
