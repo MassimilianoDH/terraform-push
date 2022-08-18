@@ -1,8 +1,7 @@
-# ADD NEW STACKS TO LIST IN JOBS.CHANGES.STEPS.FILTER
 # Ctrl+F AND REPLACE ALL INSTANCES OF "ORGANIZATION".
 # MORE INFO: https://github.com/MassimilianoDH/terraform-push
 ---
-name: "Terraform ORGANIZATION"
+name: "Terraform ORGANIZATION GCP"
 
 # You can define single or multiple events that can a trigger workflow, or set a time schedule. 
 # You can also restrict the execution of a workflow to only occur for specific files, tags, or branch changes.
@@ -14,21 +13,48 @@ on:
   pull_request:
 
 env:
+  # Needed for auth.
+  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+  GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
   # Needed to comment plan output in PR discussion.
   TF_VAR_github_owner: ORGANIZATION
   TF_VAR_github_token: ${{ secrets.PAT_TOKEN }}
+  # Needed to access Vault.
+  TF_VAR_vault_address: https://vault.ORGANIZATION.com/
+  TF_VAR_vault_token: ${{ secrets.VAULT_TOKEN }}
 
 jobs:
+  # Job to list sub-directories.
+  # More info: https://github.com/MassimilianoDH/terraform-push/.github/actions/list-directories/action.yml
+  list-dirs:
+    name: List Directories
+    runs-on: ubuntu-latest
+    outputs:
+      # Expose list as job 'list' output variable.
+      list: ${{ steps.list-dirs.outputs.list }}
+    steps:
+      # For pull requests it's not necessary to checkout the code.
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+
+      - name: List Directories   
+        uses: ./.github/actions/list-directories
+        id: list-dirs
+        with:
+          path: ./stacks/
+
   # Job to run change detection.
   # More info: https://github.com/dorny/paths-filter#conditional-execution:~:text=Use%20change%20detection
   changes:
     name: Changes Detection
+    needs: [list-dirs]
     runs-on: ubuntu-latest
     outputs:
       # Expose matched filters as job 'stacks' output variable.
       stacks: ${{ steps.filter.outputs.changes }}
     steps:
-
       # For pull requests it's not necessary to checkout the code.
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -39,16 +65,14 @@ jobs:
         uses: dorny/paths-filter@v2
         id: filter
         with:
-          # Add new directories to this list using the following syntax. 
-          # e.g. [NEW DIR]: stacks/[NEW DIR]/**
-          filters: |
-            example-bucket: stacks/example-bucket/**
-            
+          filters: 
+            "${{ needs.list-dirs.outputs.list }}"
+
   # Job to test and apply each of modified stacks.
   # More info: https://github.com/hashicorp/setup-terraform
   terraform:
     name: Terraform ORGANIZATION 
-    needs: changes
+    needs: [changes]
     runs-on: ubuntu-latest
     # More info: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstrategy
     strategy:
@@ -61,16 +85,13 @@ jobs:
         # e.g. ['stack', 'stack'] if both stack folders contains changes.
         stack: ${{ fromJSON(needs.changes.outputs.stacks) }}
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v2
         with:
           fetch-depth: 1
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 1.1.5
+        uses: hashicorp/setup-terraform@v2
 
       - name: Verify Terraform Version
         run: terraform --version
@@ -80,7 +101,7 @@ jobs:
       - name: Setup SSH for Terraform Modules
         uses: webfactory/ssh-agent@v0.5.4
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}    
+          ssh-private-key: ${{ env.SSH_PRIVATE_KEY }}
     
       # Needed for private storage buckets.
       # More info:
@@ -88,10 +109,10 @@ jobs:
       # GCP Auth: https://github.com/google-github-actions/auth
       # Azure Login: https://github.com/Azure/login
       - name: GCP Auth
-        id: auth
         uses: google-github-actions/auth@v0
+        id: auth
         with:
-          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+          credentials_json: ${{ env.GCP_SERVICE_ACCOUNT_KEY }}
 
       - name: Set up Cloud SDK with CI Credentials
         uses: google-github-actions/setup-gcloud@v0
@@ -137,25 +158,18 @@ jobs:
         uses: actions/github-script@v6
         if: github.event_name == 'pull_request'
         with:
-          github-token: ${{ secrets.PAT_TOKEN }}
+          github-token: ${{ env.TF_VAR_github_token }}
           script: |
             const output = `#### Terraform Format and Style 🖌 \`${{ steps.fmt.outcome }}\`
             #### Terraform Initialization ⚙️ \`${{ steps.init.outcome }}\`
             #### Terraform Validation 🤖 \`${{ steps.validate.outcome }}\`
             #### Terraform Plan 📖 \`${{ steps.plan.outcome }}\`
-
              <details><summary>Show Plan for ORGANIZATION ${{ matrix.stack }}</summary>
-
-             \`\`\`\n
-             
+             \`\`\`\n             
              ${process.env.PLAN}
-
              \`\`\`
-
              </details>
-
              *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-
              github.rest.issues.createComment({
                issue_number: context.issue.number,
                owner: context.repo.owner,
