@@ -56,6 +56,9 @@ until finished
 
 End with an example of getting some data out of the system or using it for a little demo.
 
+## 🚀 Deployment <a name = "deployment"></a>
+Add additional notes about how to deploy this on a live system.
+
 ## 🔧 Running the tests <a name = "tests"></a>
 Explain how to run the automated tests for this system.
 
@@ -66,18 +69,8 @@ Explain what these tests test and why
 Give an example
 ```
 
-### And coding style tests
-Explain what these tests test and why
-
-```
-Give an example
-```
-
 ## 🎈 Usage <a name="usage"></a>
 Add notes about how to use the system.
-
-## 🚀 Deployment <a name = "deployment"></a>
-Add additional notes about how to deploy this on a live system.
 
 ## ⛏️ Built Using <a name = "built_using"></a>
 - [Github Actions](https://github.com/features/actions) - Pipeline
@@ -89,7 +82,6 @@ See also the list of [contributors](https://github.com/MassimilianoDH/terraform-
 
 ## 🎉 Acknowledgements <a name = "acknowledgement"></a>
 - Hat tip to anyone whose code was used
-
 
 
 
