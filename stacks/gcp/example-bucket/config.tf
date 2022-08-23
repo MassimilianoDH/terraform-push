@@ -3,7 +3,7 @@
 
 terraform {
   backend "gcs" {
-    bucket = "ORGANIZATION-terraform-state"
+    bucket = "tfstate"
     prefix = "states/example-bucket"
   }
 }
