@@ -1,0 +1,79 @@
+# MORE INFO: https://github.com/MassimilianoDH/terraform-push
+---
+name: "Terraform"
+
+# You can define single or multiple events that can a trigger workflow, or set a time schedule. 
+# You can also restrict the execution of a workflow to only occur for specific files, tags, or branch changes.
+# More info: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on
+on:
+  pull_request:
+
+env:
+  # Needed for auth.
+  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+  GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+  # Needed to comment plan output in PR discussion.
+  GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+  # Needed to access Vault.
+  TF_VAR_vault_address: https://vault.hodlone.com/
+  TF_VAR_vault_token: ${{ secrets.VAULT_TOKEN }}
+  # Needed to access GoAlert webhook.
+  TF_VAR_webhook_url: "https://goalert.hodlone.com/webhook"
+  TF_VAR_webhook_password: ${{ secrets.WEBHOOK_PASSWORD }}
+  TF_VAR_webhook_username: GCP
+
+jobs:
+  # Job to check for changes.
+  # More info: https://github.com/MassimilianoDH/terraform-push/blob/master/.github/actions/change-detection/action.yml
+  change-detection:
+    name: Change Detection
+    runs-on: ubuntu-latest
+    outputs:
+      # Expose changed files as output variable.
+      stacks: ${{ steps.change-detection.outputs.changes }}
+    steps:
+      # For pull requests it's not necessary to checkout the code.
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+
+      - name: Change Detection   
+        uses: ./.github/actions/change-detection
+        id: change-detection
+        with:
+          path: ./stacks/
+  # Job to execute Terraform workflow.
+  # More info: https://github.com/MassimilianoDH/terraform-push/blob/master/.github/actions/terraform-make/action.yml
+  terraform-execute:
+    name: Terraform Execute
+    needs: [change-detection]
+    runs-on: ubuntu-latest
+    # More info: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstrategy
+    strategy:
+      # Fail-fast applies to the entire matrix. 
+      # If fail-fast is set to true, GitHub will cancel all in-progress and queued jobs in the matrix if any job in the matrix fails. 
+      # This property defaults to true.
+      fail-fast: false
+      matrix:
+        # Parse JSON array containing names of all filters matching any of changed files.
+        stack: ${{ fromJSON(needs.change-detection.outputs.stacks) }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+
+      - name: Setup and Authentication  
+        uses: ./.github/actions/setup-auth
+        id: setup-auth
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          gcp-credentials-json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+
+      - name: Terraform Make
+        uses: ./.github/actions/terraform-make
+        id: terraform-make
+        with:
+          stack: ${{ matrix.stack }}
+          github-token: ${{ secrets.PAT_TOKEN }}

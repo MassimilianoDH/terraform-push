@@ -1,21 +1,24 @@
-name: 'List Directories'
-description: 'Get a dorny/paths-filter@v2 friendly list of filters from a directory'
+name: 'Change Detection'
+author: '@MassimilianoDH'
+description: 'Check for changes in a directory'
 inputs:
   path:
     description: 'Path to directory'
     required: true
 outputs:
-  list: # id of output
-    description: 'A dorny/paths-filter@v2 friendly list of filters'
-    value: ${{ steps.list-dirs.outputs.list }}
+  changes:
+    description: 'List of changed files'
+    value: ${{ steps.filter.outputs.changes }}
 runs:
   using: 'composite'
   steps:
-    - id: APT
+    - name: Apt Update
       shell: bash
       run: sudo apt update && sudo apt install tree jq -y
-    - id: list-dirs
+
+    - name: List Directories
       shell: bash
+      id: list-dirs
       run: |
         path=${{ inputs.path }}
         tail="${path#./}"
@@ -28,3 +31,10 @@ runs:
         list="${list//$'\n'/'%0A'}"
         list="${list//$'\r'/'%0D'}"
         echo "::set-output name=list::$list"
+
+    - name: Filter
+      uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: 
+          "${{ steps.list-dirs.outputs.list }}"

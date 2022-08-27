@@ -1,0 +1,135 @@
+name: 'Terraform Make'
+author: '@MassimilianoDH'
+description: 'Execute Terraform Init/Plan/Apply workflow'
+inputs:
+  stack:
+    description: 'Path to directory containing Terraform configuration files'
+    required: true
+  github-token:
+    description: 'Github PAT to comment Terraform Plan in PR'
+    required: true
+  project:
+    description: 'Name of the Project or Organization'
+    required: false
+    default: '-'
+runs:
+  using: 'composite'
+  steps:
+    # Terraform format, init, validate and plan workflow.
+    - name: Check Terraform Formatting
+      shell: bash
+      id: fmt
+      run: make format-check
+
+    - name: Terraform Init
+      shell: bash
+      id: init
+      run: |
+        echo "Initializing ${{ inputs.project }} ${{ inputs.stack }}" 
+        make init-${{ inputs.stack }}
+
+    - name: Terraform Validation
+      shell: bash
+      id: validate
+      if: github.event_name == 'pull_request'
+      run: |
+        echo "Validating ${{ inputs.project }} ${{ inputs.stack }}" 
+        make validate-${{ inputs.stack }}
+
+    - name: Terraform Plan
+      shell: bash
+      id: plan
+      if: github.event_name == 'pull_request'
+      continue-on-error: true
+      run: |
+        make plan-${{ inputs.stack }}
+
+    # Expose Terraform plan as environment variable.
+    - name: Truncate Terraform Plan Result
+      shell: bash
+      run: |
+        plan=$(cat <<'EOF'
+        ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
+        EOF
+        )
+        echo "PLAN<<EOF" >> $GITHUB_ENV
+        echo "${plan:0:65536}" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+    
+    # More info: https://github.com/hashicorp/setup-terraform#:~:text=Outputs%20can%20be%20used
+    - name: Comment Plan Output in PR Discussion
+      uses: actions/github-script@v6
+      if: github.event_name == 'pull_request'
+      with:
+        github-token: ${{ inputs.github-token }}
+        script: |
+            // 1. Retrieve existing bot comments for the PR
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            })
+            const botComment = comments.find(comment => {
+              return comment.user.type === 'Bot' && comment.body.includes('Terraform Format and Style')
+            })
+
+            // 2. Prepare format of the comment
+            const output = `#### Terraform Format and Style  🖌  \`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization  ⚙️  \`${{ steps.init.outcome }}\`
+            #### Terraform Validation  🤖  \`${{ steps.validate.outcome }}\`
+
+            <details><summary>Validation Output</summary>
+
+            \`\`\`\n
+
+            ${{ steps.validate.outputs.stdout }}
+
+            \`\`\`
+
+            </details>
+
+            #### Terraform Plan  📖  \`${{ steps.plan.outcome }}\`
+            
+            <details><summary>Show Plan</summary>
+            
+            \`\`\`\n
+
+            ${process.env.PLAN}
+            
+            \`\`\`
+            
+            </details>
+            
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.tf_actions_working_dir }}\`, Workflow: \`${{ github.workflow }}\`*`;
+            
+            // 3. If we have a comment, update it, otherwise create a new one
+            if (botComment) {
+              github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: output
+              })
+            } else {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: output
+              })
+            }
+
+    - name: Terraform Plan Status
+      shell: bash
+      if: steps.plan.outcome == 'failure'
+      run: exit 1
+
+    # Apply Terrafrom plan when merging or pushing to master.
+    - name: Terraform Apply
+      shell: bash
+      id: apply
+      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+      run: |
+        make plan-${{ inputs.stack }}
+        echo "Applying ${{ inputs.project }} ${{ inputs.stack }}"
+        make apply-${{ inputs.stack }}
