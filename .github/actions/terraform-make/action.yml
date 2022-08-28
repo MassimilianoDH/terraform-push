@@ -26,7 +26,7 @@ runs:
       id: init
       run: |
         echo "Initializing ${{ inputs.project }} ${{ inputs.stack }}" 
-        make init-${{ inputs.stack }}
+        make init STACK=${{ inputs.stack }}
 
     - name: Terraform Validation
       shell: bash
@@ -34,7 +34,7 @@ runs:
       if: github.event_name == 'pull_request'
       run: |
         echo "Validating ${{ inputs.project }} ${{ inputs.stack }}" 
-        make validate-${{ inputs.stack }}
+        make validate STACK=${{ inputs.stack }}
 
     - name: Terraform Plan
       shell: bash
@@ -42,7 +42,7 @@ runs:
       if: github.event_name == 'pull_request'
       continue-on-error: true
       run: |
-        make plan-${{ inputs.stack }}
+        make plan STACK=${{ inputs.stack }}
 
     # Expose Terraform plan as environment variable.
     - name: Truncate Terraform Plan Result
@@ -100,7 +100,7 @@ runs:
             
             </details>
             
-            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.tf_actions_working_dir }}\`, Workflow: \`${{ github.workflow }}\`*`;
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
             
             // 3. If we have a comment, update it, otherwise create a new one
             if (botComment) {
@@ -130,6 +130,6 @@ runs:
       id: apply
       if: github.ref == 'refs/heads/master' && github.event_name == 'push'
       run: |
-        make plan-${{ inputs.stack }}
+        make plan STACK=${{ inputs.stack }}
         echo "Applying ${{ inputs.project }} ${{ inputs.stack }}"
-        make apply-${{ inputs.stack }}
+        make apply STACK=${{ inputs.stack }}

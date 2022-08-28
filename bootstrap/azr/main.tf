@@ -11,7 +11,7 @@ resource "random_string" "resource_code" {
 # More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group
 resource "azurerm_resource_group" "tfstate" {
   name     = "tfstate"
-  location = "East US"
+  location = "Central US"
 }
 
 # Azure storage account for Terraform.
@@ -28,7 +28,6 @@ resource "azurerm_storage_account" "tfstate" {
     environment = "dev"
   }
 }
-
 
 # Azure bucket for Terraform states.
 # More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container

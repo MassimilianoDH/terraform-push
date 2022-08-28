@@ -15,12 +15,8 @@ env:
   # Needed to comment plan output in PR discussion.
   GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
   # Needed to access Vault.
-  TF_VAR_vault_address: https://vault.hodlone.com/
+  TF_VAR_vault_address: https://vault.example.com/
   TF_VAR_vault_token: ${{ secrets.VAULT_TOKEN }}
-  # Needed to access GoAlert webhook.
-  TF_VAR_webhook_url: "https://goalert.hodlone.com/webhook"
-  TF_VAR_webhook_password: ${{ secrets.WEBHOOK_PASSWORD }}
-  TF_VAR_webhook_username: GCP
 
 jobs:
   # Job to check for changes.
@@ -32,7 +28,6 @@ jobs:
       # Expose changed files as output variable.
       stacks: ${{ steps.change-detection.outputs.changes }}
     steps:
-      # For pull requests it's not necessary to checkout the code.
       - name: Checkout Repository
         uses: actions/checkout@v2
         with:
@@ -64,16 +59,14 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Setup and Authentication  
+      - name: Terraform Setup 
         uses: ./.github/actions/setup-auth
-        id: setup-auth
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
           gcp-credentials-json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
       - name: Terraform Make
         uses: ./.github/actions/terraform-make
-        id: terraform-make
         with:
           stack: ${{ matrix.stack }}
           github-token: ${{ secrets.PAT_TOKEN }}

@@ -19,22 +19,10 @@ runs:
     - name: List Directories
       shell: bash
       id: list-dirs
-      run: |
-        path=${{ inputs.path }}
-        tail="${path#./}"
-        head="${path%/$tail}"
-        cd $path
-        tree -J -d -L 1 | jq -c '.[0].contents | map(.name)' > file.json
-        list=$(jq -r --arg stacks $tail 'to_entries|map("\(.value): \( $stacks )\(.value)/**\n")|.[]' file.json)
-        echo "$list"
-        list="${list//'%'/'%25'}"
-        list="${list//$'\n'/'%0A'}"
-        list="${list//$'\r'/'%0D'}"
-        echo "::set-output name=list::$list"
+      run: bash list-dirs.sh ${{ inputs.path }}
 
     - name: Filter
       uses: dorny/paths-filter@v2
       id: filter
       with:
-        filters: 
-          "${{ steps.list-dirs.outputs.list }}"
+        filters: ./file.yml
