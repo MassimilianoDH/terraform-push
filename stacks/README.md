@@ -1,9 +1,1 @@
-Configuration files added to these directories will be executed automatically.
-
-
-
-
-
-
-
-
+Terraform configuration files added to these directories will be executed automatically. Destroy-bin will destroy Terraform resources.

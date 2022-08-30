@@ -1,0 +1,1 @@
+Terraform configuration files added to this directory will be destroyed and moved to off-stacks automatically.

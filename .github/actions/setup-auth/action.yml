@@ -20,41 +20,45 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Setup Terraform
+    - name: 'Setup Terraform'
       uses: hashicorp/setup-terraform@v2
 
-    - name: Verify Terraform Version
+    - name: 'Verify Terraform Version'
       shell: bash
       run: terraform --version
 
     # Needed for private Git repositories.
     # https://github.com/webfactory/ssh-agent
-    - name: Setup SSH for Terraform Modules
+    - name: 'Setup SSH for Terraform Modules'
       uses: webfactory/ssh-agent@v0.5.4
+      if: inputs.ssh-key != ''
       with:
         ssh-private-key: ${{ inputs.ssh-key }}
   
     # Needed for GCP remote backend.
     # GCP Auth: https://github.com/google-github-actions/auth
-    - name: GCP Auth
+    - name: 'GCP Auth'
       uses: google-github-actions/auth@v0
+      if: inputs.gcp-credentials != ''
       with:
         credentials_json: ${{ inputs.gcp-credentials }}
 
-    - name: Set up Cloud SDK with CI Credentials
+    - name: 'Set up Cloud SDK with CI Credentials'
       uses: google-github-actions/setup-gcloud@v0
 
     # Needed for Azure remote backend.
     # Azure Login: https://github.com/Azure/login
-    - name: AZ Auth
+    - name: 'AZ Auth'
       uses: azure/login@v1
+      if: inputs.azr-credentials != ''
       with:
         creds: ${{ inputs.azr-credentials }}
 
     # Needed for AWS remote backend.    
     # AWS Credentials: https://github.com/aws-actions/configure-aws-credentials
-    - name: Configure AWS Credentials
+    - name: 'Configure AWS Credentials'
       uses: aws-actions/configure-aws-credentials@v1
+      if: inputs.aws-credentials != ''
       with:
         role-to-assume: ${{ inputs.aws-credentials }}
         aws-region: ${{ inputs.aws-credentials }}

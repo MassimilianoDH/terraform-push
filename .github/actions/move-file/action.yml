@@ -1,0 +1,31 @@
+name: 'Move File'
+author: '@MassimilianoDH'
+description: 'Moves Terraform configuration file from destroy-bin to off-stacks'
+inputs:
+  stack:
+    description: 'Path to directory containing Terraform configuration files'
+    required: true
+  github-token:
+    description: 'Github PAT to push changes into repo'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Move File'
+      shell: bash
+      run: |
+        mv ./${{ inputs.stack }} ./off-stacks/
+
+    - name: 'Commit File'
+      shell: bash
+      run: |
+        git config --local user.email "terraform-push@github"
+        git config --local user.name "terraform-push"
+        git add stacks/
+        git add off-stacks/       
+        git commit -m "${{ inputs.stack }} moved to off-stacks"
+
+    - name: 'Push Changes'
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ inputs.github-token }}

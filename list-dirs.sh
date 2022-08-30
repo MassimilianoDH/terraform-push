@@ -1,26 +1,15 @@
 #!/bin/bash
-path=$1
 
-cd $path
-tree -J -d -L 1 | jq -c '.[0].contents | map(.name)' > main.json
-mv main.json ..
-cd ..
+path=$(basename $1) # ./stacks/ - stacks
+tree -J -d -L 1 ./$path | jq -c '.[0].contents | map(.name)' > $path.json
 
-jq -c '.[]' main.json | while read i; do
-    providers="${i%\"}"
-    providers="${providers#\"}"
-    cd $path/$providers
-    tree -J -d -L 1 | jq -c '.[0].contents | map(.name)' > $providers.json
-    mv $providers.json ../..
-    cd ../..
+jq -c -r '.[]' $path.json | while read provider; do
+    tree -J -d -L 1 ./$path/$provider | jq -c '.[0].contents | map(.name)' > $provider.json
 done
 
-jq -c '.[]' main.json | while read i; do
-    providers="${i%\"}"
-    providers="${providers#\"}"
-    tail="${path#./}"
-    jq -r --arg tail $tail --arg providers $providers 'to_entries|map("\($providers)/\(.value): \($tail)\($providers)/\(.value)/**\n")|.[]' $providers.json >> file.yml
-    rm $providers.json
+jq -c -r '.[]' $path.json | while read provider; do
+    jq -r --arg path $path --arg provider $provider 'to_entries|map("\($path)/\($provider)/\(.value): \($path)/\($provider)/\(.value)/**\n")|.[]' $provider.json >> filters.yml
+    rm $provider.json
 done
 
-rm main.json
+rm $path.json

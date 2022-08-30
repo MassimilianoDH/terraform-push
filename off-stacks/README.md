@@ -1,9 +1,1 @@
-A place to keep un-used configuration files.
-
-
-
-
-
-
-
-
+A place to keep un-used Terraform configuration files.

@@ -1,1 +1,5 @@
 bootstrap/.terraform/
+bootstrap/.terraform/
+**/.terraform/
+**/tfplan
+**/*.lock.hcl

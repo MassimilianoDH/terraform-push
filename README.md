@@ -76,12 +76,3 @@ See also the list of [contributors](https://github.com/MassimilianoDH/terraform-
 
 ## 🎉 Acknowledgements <a name = "acknowledgement"></a>
 - Hat tip to anyone whose code was used
-
-
-
-
-
-
-
-
-

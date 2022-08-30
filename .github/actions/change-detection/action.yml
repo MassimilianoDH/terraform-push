@@ -12,17 +12,17 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - name: Apt Update
+    - name: 'Apt Update'
       shell: bash
       run: sudo apt update && sudo apt install tree jq -y
 
-    - name: List Directories
+    - name: 'List Directories'
       shell: bash
       id: list-dirs
       run: bash list-dirs.sh ${{ inputs.path }}
 
-    - name: Filter
+    - name: 'Filter'
       uses: dorny/paths-filter@v2
       id: filter
       with:
-        filters: ./file.yml
+        filters: ./filters.yml

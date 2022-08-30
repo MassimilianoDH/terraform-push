@@ -1,11 +1,14 @@
 # MORE INFO: https://github.com/MassimilianoDH/terraform-push
 ---
-name: "Terraform"
+name: 'Terraform'
 
 # You can define single or multiple events that can a trigger workflow, or set a time schedule. 
 # You can also restrict the execution of a workflow to only occur for specific files, tags, or branch changes.
 # More info: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on
 on:
+  push:
+    branches:
+      - master
   pull_request:
 
 env:
@@ -14,36 +17,35 @@ env:
   GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
   # Needed to comment plan output in PR discussion.
   GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-  # Needed to access Vault.
-  TF_VAR_vault_address: https://vault.example.com/
-  TF_VAR_vault_token: ${{ secrets.VAULT_TOKEN }}
 
 jobs:
   # Job to check for changes.
   # More info: https://github.com/MassimilianoDH/terraform-push/blob/master/.github/actions/change-detection/action.yml
   change-detection:
-    name: Change Detection
-    runs-on: ubuntu-latest
+    name: 'Change Detection'
+    runs-on: 'ubuntu-latest'
     outputs:
       # Expose changed files as output variable.
       stacks: ${{ steps.change-detection.outputs.changes }}
     steps:
-      - name: Checkout Repository
+      - name: 'Checkout Repository'
         uses: actions/checkout@v2
         with:
           fetch-depth: 1
 
-      - name: Change Detection   
+      - name: 'Change Detection' 
         uses: ./.github/actions/change-detection
         id: change-detection
         with:
-          path: ./stacks/
+          path: ./stacks/ # stacks directory
+
   # Job to execute Terraform workflow.
   # More info: https://github.com/MassimilianoDH/terraform-push/blob/master/.github/actions/terraform-make/action.yml
   terraform-execute:
-    name: Terraform Execute
+    name: 'Terraform Execute'
     needs: [change-detection]
-    runs-on: ubuntu-latest
+    runs-on: 'ubuntu-latest'
+    if: ${{ needs.change-detection.outputs.stacks != '[]' && needs.change-detection.outputs.stacks != '' }}
     # More info: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstrategy
     strategy:
       # Fail-fast applies to the entire matrix. 
@@ -54,19 +56,36 @@ jobs:
         # Parse JSON array containing names of all filters matching any of changed files.
         stack: ${{ fromJSON(needs.change-detection.outputs.stacks) }}
     steps:
-      - name: Checkout Repository
+      - name: 'Checkout Repository'
         uses: actions/checkout@v2
         with:
           fetch-depth: 1
 
-      - name: Terraform Setup 
+      - name: 'Terraform Setup'
         uses: ./.github/actions/setup-auth
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-          gcp-credentials-json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+          ssh-key: ${{ env.SSH_PRIVATE_KEY }}
+          gcp-credentials: ${{ env.GCP_SERVICE_ACCOUNT_KEY }}
 
-      - name: Terraform Make
-        uses: ./.github/actions/terraform-make
+      - name: 'Terraform Make'
+        uses: ./.github/actions/terraform
+        if: ${{ !contains(matrix.stack, 'destroy-bin') }}
+        with:
+          stack: ${{ matrix.stack }}
+          github-token: ${{ secrets.PAT_TOKEN }}
+
+      - name: 'Terraform Break'
+        uses: ./.github/actions/terraform
+        id: break
+        if: ${{ contains(matrix.stack, 'destroy-bin') }}
+        with:
+          stack: ${{ matrix.stack }}
+          github-token: ${{ secrets.PAT_TOKEN }}
+          flags: '-destroy'
+
+      - name: 'Move File'
+        uses: ./.github/actions/move-file
+        if: steps.break.outputs.applied == 'true'
         with:
           stack: ${{ matrix.stack }}
           github-token: ${{ secrets.PAT_TOKEN }}
