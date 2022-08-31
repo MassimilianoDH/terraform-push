@@ -15,7 +15,7 @@
 
 ---
 
-<p align="center"> A simple and easy-to-use GitOps CI for all your Terraform needs!
+<p align="center"> This is Terraform Push, a completely automated multi-cloud GitOps CI for Terraform.
     <br> 
 </p>
 
@@ -30,26 +30,17 @@
 - [Acknowledgments](#acknowledgement)
 
 ## 🧐 About Terraform Push <a name = "about"></a>
-Terraform Push is an automated continuous integration repository template for deploying Terraform configuration files into a GCP-backed project (support for other cloud providers coming soon). The CI/CD paradigm establishes version control repositories as the source of truth for your deployments. In this case, we will use GitHub and its capabilities (Github Actions and Repository Templating) to automate Terraform operations in a remote environment.
+Terraform Push is an completely automated continuous integration repository template for deploying Terraform configuration files into a single or multi-cloud project. Setup is minimal, only add credentials for cloud authentication as Github secrets. Afterwards you will be able to drop Terraform configuration files into terraform-push/stacks, push them to master and it will be applied automatically.
 
-## 🏁 Getting Started <a name = "getting_started"></a>
-Setting up your own Terraform CI is now easy as it can get. Simply create a new reposity using Terraform Push as a template, add the necessaty secrets for your Github Actions and enjoy Terraforming!
-
-### Prerequisites
-The only prerequisite needed to set up your Terraform CI is a working Google Cloud Project with billing enabled. For more information on how to [Creating and Managing Google Projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
-
-### Installing
-- [Repository](###repository)
-- [Bootstrap](###bootstrap)
-- [Secrets](###secrets)
-- [Machine User (optional)](###machine_user)
+## 🏁 Pre-Requisites <a name = "getting_started"></a>
+Working cloud provider account.
 
 ## 🚀 Deployment <a name = "deployment"></a>
 ### Repository <a name = "repository"></a>
 The first step of our process is to create a Github Repository using Terraform Push as a template. On the top right corner of this repo (Terraform Push), you will find a green button to use this template. Press it and follow the repository creation form.
 
 ### Bootstrap <a name = "bootstrap"></a>
-After our codebase is created, we will need to Bootstrap our remote backend using the Terraform configuration file found inside our repo. Replace ORGANIZATION with the name of your project and follow the standard Terraform Init/Plan/Apply workflow. Since this backend won't require any changes afterwards, I would suggest deleting the local state for safety reasons.
+After our codebase is created, we will need to Bootstrap our remote backend using the Terraform configuration file found inside our repo. Since this backend won't require any changes afterwards, I would suggest deleting the local state for safety reasons.
 
 ### Secrets <a name = "secrets"></a>
 Add the Github Actions secrets required for authentication. On the newly created repo go to Settings, then Secrets and Actions. Press New repository secret and add the following secrets:
@@ -67,7 +58,15 @@ To get our Terraform Plan outputs in a easy to access manner, these need to be p
 Add notes about how to use the system.
 
 ## ⛏️ Built Using <a name = "built_using"></a>
-- [Github Actions](https://github.com/features/actions) - Pipeline
+- [GitOps](https://about.gitlab.com/topics/gitops/) - Base
+- [Github Actions](https://github.com/features/actions/) - Pipeline
+- [GNU Bash](https://www.gnu.org/software/bash/) - Scripting
+- [jq](https://stedolan.github.io/jq/) - Scripting
+- [Hashicorp Terraform](https://www.terraform.io/)) - Base
+- [Google Cloud](https://cloud.google.com/) - Cloud
+- [Microsoft Azure](https://azure.microsoft.com/en-us/) - Cloud
+- [Amazon Web Services](https://aws.amazon.com/) - Cloud
+- [GNU Make](https://www.gnu.org/software/make/manual/make.html)
 
 ## ✍️ Authors <a name = "authors"></a>
 - [@MassimilianoDH](https://github.com/MassimilianoDH) - Idea & Initial Work
