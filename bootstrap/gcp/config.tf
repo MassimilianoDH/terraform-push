@@ -11,6 +11,6 @@ terraform {
 }
 
 provider "google" {
-  project     = "my-project-id"
-  region      = "us-central1"
+  project = "my-project-id"
+  region  = "us-central1"
 }
