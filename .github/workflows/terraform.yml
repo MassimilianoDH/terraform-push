@@ -22,9 +22,10 @@ env:
   # More info:  https://github.com/Azure/login
   AZR_DEPLOYMENT_CREDENTIALS: ${{ secrets.AZR_DEPLOYMENT_CREDENTIALS }}
   TF_VAR_client_secret: ${{ secrets.AZR_CLIENT_SECRET }}
-  # AWS Role to Assume
+  # AWS IAM User Access Key
   # More info:  https://github.com/aws-actions/configure-aws-credentials
-  AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+  AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+  AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
   AWS_REGION: ${{ secrets.AWS_REGION }}
   # Needed to comment plan output in PR discussion.
   PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
@@ -75,10 +76,11 @@ jobs:
       - name: 'Terraform Setup'
         uses: ./.github/actions/setup-auth
         with:
-          ssh-key: ${{ env.SSH_PRIVATE_KEY }}
-          gcp-credentials: ${{ env.GCP_SERVICE_ACCOUNT_KEY }}
-          azr-credentials: ${{ env.AZR_DEPLOYMENT_CREDENTIALS }}
-          aws-credentials: ${{ env.AWS_ROLE_TO_ASSUME }}
+          ssh-private-key: ${{ env.SSH_PRIVATE_KEY }}
+          gcp-credentials-json: ${{ env.GCP_SERVICE_ACCOUNT_KEY }}
+          azr-creds: ${{ env.AZR_DEPLOYMENT_CREDENTIALS }}
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_KEY }} 
           aws-region: ${{ env.AWS_REGION }}
   
       # More info: https://github.com/MassimilianoDH/terraform-push/blob/master/.github/actions/terraform/action.yml
