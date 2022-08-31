@@ -4,7 +4,7 @@
 terraform {
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
       version = "4.28.0"
     }
   }
@@ -13,7 +13,7 @@ terraform {
     key            = "states/example-vpc/terraform.tfstate"
     region         = "us-east-1"
     encrypt        = true
-    kms_key_id     = "THE_ID_OF_THE_KMS_KEY" # Terraform Plan Output
+    kms_key_id     = "THE_ID_OF_THE_KMS_KEY"        # Terraform Plan Output
     dynamodb_table = "THE_ID_OF_THE_DYNAMODB_TABLE" # Terraform Plan Output
   }
 }
