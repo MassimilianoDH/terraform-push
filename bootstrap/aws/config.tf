@@ -3,7 +3,7 @@
 
 # More info: https://github.com/nozaq/terraform-aws-remote-state-s3-backend
 provider "aws" {
-  region = "us-central-1"
+  region = "us-east-1"
 }
 
 provider "aws" {
