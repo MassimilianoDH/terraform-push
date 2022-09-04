@@ -1,0 +1,2 @@
+- Terraform configuration files added to this sub-directory will be DESTROYED and moved to off-stacks automatically.
+- Don't remove or rename.

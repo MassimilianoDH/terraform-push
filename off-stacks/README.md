@@ -1,1 +1,2 @@
-A place to keep un-used Terraform configuration files.
+- A place to keep un-used Terraform configuration files.
+- Don't remove or rename.

@@ -2,9 +2,12 @@ name: 'Change Detection'
 author: '@MassimilianoDH'
 description: 'Check for changes in a directory'
 inputs:
-  path:
+  make:
     description: 'Path to directory'
     required: true
+  break:
+    description: 'Path to directory'
+    required: false
 outputs:
   changes:
     description: 'List of changed files'
@@ -16,10 +19,15 @@ runs:
       shell: bash
       run: sudo apt update && sudo apt install tree jq -y
 
-    - name: 'List Directories'
+    - name: 'List Make'
       shell: bash
-      id: list-dirs
-      run: bash list-dirs.sh ${{ inputs.path }}
+      run: |
+        bash list-dirs.sh ${{ inputs.make }}
+
+    - name: 'List Break'
+      shell: bash
+      run: |
+        bash list-dirs.sh ${{ inputs.break }}
 
     - name: 'Filter'
       uses: dorny/paths-filter@v2

@@ -21,7 +21,7 @@ runs:
       run: |
         git config --local user.email "terraform-push@github"
         git config --local user.name "terraform-push"
-        git add stacks/
+        git add destroy-bin/
         git add off-stacks/       
         git commit -m "${{ inputs.stack }} moved to off-stacks"
 
