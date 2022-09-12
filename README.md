@@ -30,7 +30,7 @@
 - [Acknowledgments](#acknowledgement)
 
 ## 🧐 About <a name = "about"></a>
-Terraform Push is a repository template capable of creating a fully functional GitOps CI for Hashicorp Terraform. With minimal set-up, this CI can deploy Terraform resources to single OR multiple cloud providers in a secure and concurrent pipeline. Once in working condition, users can add Terraform configuration files to the desired directories, and it will be applied automatically after pushing or merging them to Master.
+Terraform Push is a repository template capable of creating a fully functional GitOps CI for Hashicorp Terraform. With minimal set-up, this CI can deploy Terraform resources to single OR multiple Cloud Providers in a secure and concurrent pipeline. Once in working condition, users can add Terraform configuration files to the desired directories, and it will be applied automatically after pushing or merging them to Master.
 
 ### Features <a name = "features"></a>
 
@@ -43,17 +43,17 @@ Terraform Push is a repository template capable of creating a fully functional G
 
 - Basic understanding of GitHub Actions and Secrets
 - Basic knowledge of Hashicorp Terraform
-- At least ONE working cloud provider account (GCP, Azure, AWS)
+- At least ONE working Cloud Provider account (GCP, Azure, AWS)
 
 ## 🚀 Set-Up <a name = "setup"></a>
 ### Repository (required) <a name = "repository"></a>
 The first step of this process is to create a GitHub repository using Terraform Push as a template. In the top right corner of this repo, you will find a green button to use this template. Press it and follow the repository creation form.
 
 ### Bootstrap (optional) <a name = "bootstrap"></a>
-Since our Terraform client will be running on a GitHub-provided container, we need a remote backend to keep track of Terraform state files. Use the Terraform configuration files found inside terraform-push/bootstrap to create a working backend on your desired cloud provider. You need an authenticated cloud provider account for this to work. If you already have one working backend, skip this step. Terraform Push should be able to store state files in an existing backend.
+Since our Terraform client will be running on a GitHub-provided container, we need a remote backend to keep track of Terraform state files. Use the Terraform configuration files found inside terraform-push/bootstrap to create a working backend on your desired Cloud Provider. You need an authenticated Cloud Provider account for this to work. If you already have one working backend, skip this step. Terraform Push should be able to store state files in an existing backend.
 
 ### Secrets (required/optional) <a name = "secrets"></a>
-GitHub secrets are a secure way to pass the necessary credentials to authenticate this CI. Only add the secrets required for your preferred cloud provider(s). You may also add an SSH private key for SSH authentication. On the newly created repository, go to: Settings > Secrets > Actions. Press 'New repository secret' and add the following secrets:
+GitHub secrets are a secure way to pass the necessary credentials to authenticate this CI. Only add the secrets required for your preferred Cloud Provider(s). You may also add an SSH private key for SSH authentication. On the newly created repository, go to: Settings > Secrets > Actions. Press 'New repository secret' and add the following secrets:
 
 #### Common (required)
 - PAT_TOKEN: Personal Access Token used to log into Pull Requests and comment Terraform Plan output. More information on [Creating a Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token).
