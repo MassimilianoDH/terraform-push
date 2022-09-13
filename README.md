@@ -81,7 +81,28 @@ A GitHub user is necessary to make comments on Pull Requests. These comments wil
 ## 🎈 Usage <a name="usage"></a>
 Add your Terraform configuration files contained inside a directory to any sub-directory inside terraform-push/stacks. The name of the sub-directories inside terraform-push/stacks does not affect the functioning of this CI. Sub-directories can be added or removed. terraform-push/destroy-bin will destroy Terraform resources. Current sub-directories are there for demonstration purposes.
 
-Example: terraform-push/stacks/foo/bar/main.tf
+Example:
+
+```
+├── .github
+├── bootstrap
+├── destroy-bin
+├── off-stacks
+├── stacks
+|  ├── foo (Group)
+|  |  ├── bucket (Terraform Resource)
+|  |  |  ├── main.tf
+|  |  |  └── config.tf
+|  |  └── ...
+|  |
+|  ├── bar (Group)
+|  |  ├── vpc (Terraform Resource)
+|  |  |  ├── main.tf
+|  |  |  └── config.tf
+|  |  └── ...
+|  └── ...
+└── ...
+```
 
 ### Per Team
 
