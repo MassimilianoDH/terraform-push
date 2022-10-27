@@ -18,7 +18,7 @@ runs:
     - name: 'List'
       shell: bash
       run: |
-        bash ./.github/list-dirs.sh ${{ inputs.path }} ${{ inputs.extension }}
+        bash ./.github/actions/change-detection/list-dirs.sh ${{ inputs.path }} ${{ inputs.extension }}
 
     - name: 'Filter'
       uses: dorny/paths-filter@v2
