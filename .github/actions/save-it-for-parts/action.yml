@@ -1,12 +1,12 @@
-name: 'Move File'
+name: 'Save it for Parts'
 author: '@MassimilianoDH'
-description: 'Moves Terraform configuration file from destroy-bin to off-stacks'
+description: 'Moves files from destroy-bin to save-it-for-parts'
 inputs:
   stack:
-    description: 'Path to directory containing Terraform configuration files'
+    description: 'Path to directory'
     required: true
   github-token:
-    description: 'Github PAT to push changes into repo'
+    description: 'Github PAT'
     required: true
 runs:
   using: 'composite'
@@ -14,7 +14,7 @@ runs:
     - name: 'Move File'
       shell: bash
       run: |
-        mv ./${{ inputs.stack }} ./off-stacks/
+        mv ${{ inputs.stack }} ./save-it-for-parts/
 
     - name: 'Commit File'
       shell: bash
@@ -22,8 +22,8 @@ runs:
         git config --local user.email "terraform-push@github"
         git config --local user.name "terraform-push"
         git add destroy-bin/
-        git add off-stacks/       
-        git commit -m "${{ inputs.stack }} moved to off-stacks"
+        git add save-it-for-parts/ 
+        git commit -m "${{ inputs.stack }} moved to save-it-for-parts"
 
     - name: 'Push Changes'
       uses: ad-m/github-push-action@master

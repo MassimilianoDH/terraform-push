@@ -9,7 +9,7 @@ inputs:
     description: 'Github PAT to comment Terraform Plan in PR'
     required: true
   flags:
-    description: 'flags passed to Terraform'
+    description: 'Flags passed to Terraform'
     required: false
     default: ''
   project:
@@ -23,6 +23,13 @@ outputs:
 runs:
   using: 'composite'
   steps:
+    - name: 'Setup Terraform'
+      uses: hashicorp/setup-terraform@v2
+
+    - name: 'Verify Terraform Version'
+      shell: bash
+      run: terraform --version
+      
     # Terraform format, init, validate and plan workflow.
     - name: 'Check Terraform Formatting'
       shell: bash
@@ -137,4 +144,4 @@ runs:
       shell: bash
       id: applied
       if: steps.apply.outcome == 'success'
-      run: echo "::set-output name=applied::true"
+      run: echo "applied=true" >> $GITHUB_OUTPUT

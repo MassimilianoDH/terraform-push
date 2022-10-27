@@ -40,7 +40,7 @@ jobs:
       stacks: ${{ steps.change-detection.outputs.changes }}
     steps:
       - name: 'Checkout Repository'
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 1
 
@@ -49,15 +49,15 @@ jobs:
         uses: ./.github/actions/change-detection
         id: change-detection
         with:
-          make: ./stacks/ # stacks directory
-          break: ./destroy-bin/ # destroy bin
+          path: '.' # All repo
+          extension: 'tf' # Terraform file extension
 
   # Job to execute Terraform workflow.
-  terraform-make:
-    name: 'Terraform Make'
+  terraform:
+    name: 'Terraform'
     needs: [change-detection]
     runs-on: 'ubuntu-latest'
-    if: ${{ needs.change-detection.outputs.stacks != '[]' && needs.change-detection.outputs.stacks != '' && !contains(needs.change-detection.outputs.stacks, 'destroy-bin') }}
+    if: ${{ needs.change-detection.outputs.stacks != '[]' && needs.change-detection.outputs.stacks != '' }}       
     # More info: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstrategy
     strategy:
       # Fail-fast applies to the entire matrix. 
@@ -69,12 +69,12 @@ jobs:
         stack: ${{ fromJSON(needs.change-detection.outputs.stacks) }}
     steps:
       - name: 'Checkout Repository'
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 1
 
       # More info: https://github.com/MassimilianoDH/terraform-push/blob/master/.github/actions/setup-auth/action.yml
-      - name: 'Terraform Setup'
+      - name: 'Auth Setup'
         uses: ./.github/actions/setup-auth
         with:
           ssh-private-key: ${{ env.SSH_PRIVATE_KEY }}
@@ -87,53 +87,23 @@ jobs:
       # More info: https://github.com/MassimilianoDH/terraform-push/blob/master/.github/actions/terraform/action.yml
       - name: 'Terraform Make'
         uses: ./.github/actions/terraform
+        if: contains(matrix.stack, 'live-stacks')
         with:
           stack: ${{ matrix.stack }}
           github-token: ${{ env.PAT_TOKEN }}
 
-  # Job to execute Terraform workflow.
-  terraform-break:
-    name: 'Terraform Break'
-    needs: [change-detection]
-    runs-on: 'ubuntu-latest'
-    if: ${{ needs.change-detection.outputs.stacks != '[]' && needs.change-detection.outputs.stacks != '' && contains(needs.change-detection.outputs.stacks, 'destroy-bin') }}
-    # More info: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstrategy
-    strategy:
-      # Fail-fast applies to the entire matrix. 
-      # If fail-fast is set to true, GitHub will cancel all in-progress and queued jobs in the matrix if any job in the matrix fails. 
-      # This property defaults to true.
-      fail-fast: false
-      matrix:
-        # Parse JSON array containing names of all filters matching any of changed files.
-        stack: ${{ fromJSON(needs.change-detection.outputs.stacks) }}
-    steps:
-      - name: 'Checkout Repository'
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 1
-
-      # More info: https://github.com/MassimilianoDH/terraform-push/blob/master/.github/actions/setup-auth/action.yml
-      - name: 'Terraform Setup'
-        uses: ./.github/actions/setup-auth
-        with:
-          ssh-private-key: ${{ env.SSH_PRIVATE_KEY }}
-          gcp-credentials-json: ${{ env.GCP_SERVICE_ACCOUNT_KEY }}
-          azr-creds: ${{ env.AZR_DEPLOYMENT_CREDENTIALS }}
-          aws-access-key-id: ${{ env.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ env.AWS_SECRET_KEY }} 
-          aws-region: ${{ env.AWS_REGION }}
-
       - name: 'Terraform Break'
         uses: ./.github/actions/terraform
+        if: contains(matrix.stack, 'destroy-bin')
         id: break
         with:
           stack: ${{ matrix.stack }}
           github-token: ${{ env.PAT_TOKEN }}
           flags: '-destroy'
 
-      # More info: https://github.com/MassimilianoDH/terraform-push/blob/master/.github/actions/move-file/action.yml
-      - name: 'Move File'
-        uses: ./.github/actions/move-file
+      # More info: https://github.com/MassimilianoDH/terraform-push/blob/master/.github/actions/save-it-for-parts/action.yml
+      - name: 'Save it for Parts'
+        uses: ./.github/actions/save-it-for-parts
         if: steps.break.outputs.applied == 'true'
         with:
           stack: ${{ matrix.stack }}

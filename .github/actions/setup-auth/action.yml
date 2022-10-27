@@ -1,6 +1,6 @@
-name: 'Setup and Authentication'
+name: 'Setup Authentication'
 author: '@MassimilianoDH'
-description: 'Setup Terraform and Authenticate to Cloud'
+description: 'Authenticate to Cloud Providers'
 inputs:
   ssh-private-key:
     description: 'SSH key to access private Git repositories'
@@ -23,17 +23,10 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: 'Setup Terraform'
-      uses: hashicorp/setup-terraform@v2
-
-    - name: 'Verify Terraform Version'
-      shell: bash
-      run: terraform --version
-
     # Needed for private Git repositories.
     # https://github.com/webfactory/ssh-agent
     - name: 'Setup SSH for Terraform Modules'
-      uses: webfactory/ssh-agent@v0.5.4
+      uses: webfactory/ssh-agent@v0.6.0
       if: inputs.ssh-private-key != ''
       with:
         ssh-private-key: ${{ inputs.ssh-private-key }}
